@@ -1,0 +1,57 @@
+.sales-container {
+  padding: 20px;
+}
+
+.search-container {
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+  table th, table td {
+    padding: 8px;
+    text-align: left;
+  }
+
+  table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+.form-container {
+  margin-top: 30px;
+}
+
+  .form-container input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+  button[type="button"] {
+    background-color: #ccc;
+  }
+
+  button:hover {
+    background-color: #0056b3;
+  }
+
+  button[type="submit"]:disabled {
+    background-color: #999;
+    cursor: not-allowed;
+  }

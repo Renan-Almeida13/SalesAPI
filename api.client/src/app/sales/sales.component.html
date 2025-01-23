@@ -1,0 +1,71 @@
+<div class="sales-container">
+  <!-- Formulário de Pesquisa -->
+  <div class="search-container">
+    <form [formGroup]="searchForm" (ngSubmit)="search()">
+      <input type="text" formControlName="term" placeholder="Search for a sale" />
+      <button type="submit">Search</button>
+    </form>
+  </div>
+
+  <!-- Tabela de Vendas -->
+  <table *ngIf="sales.length > 0">
+    <thead>
+      <tr>
+        <th>Sale Number</th>
+        <th>Date</th>
+        <th>Customer</th>
+        <th>Total Amount</th>
+        <th>Branch</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let sale of sales">
+        <td>{{ sale.saleNumber }}</td>
+        <td>{{ sale.date | date: 'shortDate' }}</td>
+        <td>{{ sale.customer }}</td>
+        <td>{{ sale.totalAmount | currency }}</td>
+        <td>{{ sale.branch }}</td>
+        <td>
+          <button (click)="editSale(sale)">Edit</button>
+          <button (click)="deleteSale(sale.id)">Delete</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Se não houver vendas -->
+  <div *ngIf="sales.length === 0">
+    <p>No sales found. Please add a sale.</p>
+  </div>
+
+  <!-- Formulário para Adicionar ou Editar Vendas -->
+  <div class="form-container">
+    <form [formGroup]="editForm" (ngSubmit)="isEditing ? updateSale() : addSale()">
+      <div>
+        <label for="saleNumber">Sale Number</label>
+        <input id="saleNumber" formControlName="saleNumber" />
+      </div>
+      <div>
+        <label for="date">Date</label>
+        <input id="date" type="date" formControlName="date" />
+      </div>
+      <div>
+        <label for="customer">Customer</label>
+        <input id="customer" formControlName="customer" />
+      </div>
+      <div>
+        <label for="totalAmount">Total Amount</label>
+        <input id="totalAmount" type="number" formControlName="totalAmount" />
+      </div>
+      <div>
+        <label for="branch">Branch</label>
+        <input id="branch" formControlName="branch" />
+      </div>
+      <div class="form-actions">
+        <button type="submit">{{ isEditing ? 'Update Sale' : 'Add Sale' }}</button>
+        <button type="button" (click)="resetForm()">Reset</button>
+      </div>
+    </form>
+  </div>
+</div>
