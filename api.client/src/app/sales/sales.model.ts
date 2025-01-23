@@ -1,8 +1,14 @@
 export interface Sale {
   id: number;
-  saleNumber: string;
-  date: Date; // Use 'string' se estiver usando formato 'yyyy-MM-dd' no frontend
+  saleDate: string;
   customer: string;
-  totalAmount: number;
   branch: string;
+  products: { productName: string; quantity: number; unitPrice: number; totalAmount: number }[];
+}
+
+export interface SaleItem {
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  totalAmount: number;
 }

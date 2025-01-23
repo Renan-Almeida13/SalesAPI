@@ -1,38 +1,34 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { Sale } from './sales.model';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class SalesService {
-  private salesSubject = new BehaviorSubject<Sale[]>([]);
-  sales$ = this.salesSubject.asObservable();
+  private apiUrl = `${environment.apiUrl}/sales`;
 
   constructor(private http: HttpClient) { }
 
-  loadAllSales() {
-    this.http.get<Sale[]>('/api/sales').subscribe((sales) => {
-      this.salesSubject.next(sales);
-    });
+  getSales(): Observable<Sale[]> {
+    return this.http.get<Sale[]>(this.apiUrl);
   }
 
-  searchSales(term: string) {
-    this.http.get<Sale[]>(`/api/sales/search?term=${term}`).subscribe((sales) => {
-      this.salesSubject.next(sales);
-    });
+  getSaleById(id: number): Observable<Sale> {
+    return this.http.get<Sale>(`${this.apiUrl}/${id}`);
   }
 
-  addSale(sale: Sale) {
-    return this.http.post('/api/sales', sale);
+  addSale(sale: Sale): Observable<Sale> {
+    return this.http.post<Sale>(this.apiUrl, sale);
   }
 
-  updateSale(id: number, sale: Sale) {
-    return this.http.put(`/api/sales/${id}`, sale);
+  updateSale(sale: Sale): Observable<Sale> {
+    return this.http.put<Sale>(`${this.apiUrl}/${sale.id}`, sale);
   }
 
-  deleteSale(id: number) {
-    return this.http.delete(`/api/sales/${id}`);
+  deleteSale(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }

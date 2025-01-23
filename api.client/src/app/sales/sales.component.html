@@ -1,71 +1,72 @@
-<div class="sales-container">
-  <!-- Formulário de Pesquisa -->
-  <div class="search-container">
-    <form [formGroup]="searchForm" (ngSubmit)="search()">
-      <input type="text" formControlName="term" placeholder="Search for a sale" />
-      <button type="submit">Search</button>
-    </form>
+<div class="container">
+  <h1>Sales Management</h1>
+
+  <div class="actions">
+    <button (click)="openCreateModal()">Add New Sale</button>
   </div>
 
-  <!-- Tabela de Vendas -->
-  <table *ngIf="sales.length > 0">
-    <thead>
-      <tr>
-        <th>Sale Number</th>
-        <th>Date</th>
-        <th>Customer</th>
-        <th>Total Amount</th>
-        <th>Branch</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let sale of sales">
-        <td>{{ sale.saleNumber }}</td>
-        <td>{{ sale.date | date: 'shortDate' }}</td>
-        <td>{{ sale.customer }}</td>
-        <td>{{ sale.totalAmount | currency }}</td>
-        <td>{{ sale.branch }}</td>
-        <td>
-          <button (click)="editSale(sale)">Edit</button>
-          <button (click)="deleteSale(sale.id)">Delete</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- Se não houver vendas -->
-  <div *ngIf="sales.length === 0">
-    <p>No sales found. Please add a sale.</p>
+  <div *ngIf="sales.length > 0">
+    <h2>Registered Sales</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Date</th>
+          <th>Customer</th>
+          <th>Total</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let sale of sales">
+          <td>{{ sale.id }}</td>
+          <td>{{ sale.saleDate | date }}</td>
+          <td>{{ sale.customer }}</td>
+          <td>{{ sale.totalSaleAmount | currency }}</td>
+          <td>
+            <button (click)="editSale(sale)">Edit</button>
+            <button (click)="deleteSale(sale.id)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
-  <!-- Formulário para Adicionar ou Editar Vendas -->
-  <div class="form-container">
-    <form [formGroup]="editForm" (ngSubmit)="isEditing ? updateSale() : addSale()">
-      <div>
-        <label for="saleNumber">Sale Number</label>
-        <input id="saleNumber" formControlName="saleNumber" />
-      </div>
-      <div>
-        <label for="date">Date</label>
-        <input id="date" type="date" formControlName="date" />
-      </div>
-      <div>
-        <label for="customer">Customer</label>
-        <input id="customer" formControlName="customer" />
-      </div>
-      <div>
-        <label for="totalAmount">Total Amount</label>
-        <input id="totalAmount" type="number" formControlName="totalAmount" />
-      </div>
-      <div>
-        <label for="branch">Branch</label>
-        <input id="branch" formControlName="branch" />
-      </div>
-      <div class="form-actions">
-        <button type="submit">{{ isEditing ? 'Update Sale' : 'Add Sale' }}</button>
-        <button type="button" (click)="resetForm()">Reset</button>
-      </div>
-    </form>
+  <div *ngIf="!sales.length">
+    <p>No sales registered.</p>
+  </div>
+
+  <div class="modal" *ngIf="showModal">
+    <div class="modal-content">
+      <h3>{{ isEditMode ? 'Edit Sale' : 'New Sale' }}</h3>
+      <form (ngSubmit)="saveSale()">
+        <label for="customer">Customer:</label>
+        <input type="text" id="customer" [(ngModel)]="saleForm.customer" name="customer" required />
+
+        <label for="saleDate">Sale Date:</label>
+        <input type="date" id="saleDate" [(ngModel)]="saleForm.saleDate" name="saleDate" required />
+
+        <label for="branch">Branch:</label>
+        <input type="text" id="branch" [(ngModel)]="saleForm.branch" name="branch" required />
+
+        <div *ngFor="let product of saleForm.products; let i = index">
+          <h4>Product {{ i + 1 }}</h4>
+          <label for="productName">Product:</label>
+          <input type="text" [(ngModel)]="product.productName" name="productName" required />
+
+          <label for="quantity">Quantity:</label>
+          <input type="number" [(ngModel)]="product.quantity" name="quantity" required />
+
+          <label for="unitPrice">Unit Price:</label>
+          <input type="number" [(ngModel)]="product.unitPrice" name="unitPrice" required />
+
+          <label for="totalAmount">Total:</label>
+          <input type="number" [(ngModel)]="product.totalAmount" name="totalAmount" [value]="product.quantity * product.unitPrice" disabled />
+        </div>
+
+        <button type="submit">{{ isEditMode ? 'Update' : 'Create' }} Sale</button>
+        <button type="button" (click)="closeModal()">Cancel</button>
+      </form>
+    </div>
   </div>
 </div>
