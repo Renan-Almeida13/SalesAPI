@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { SalesService } from './sales.service';
 import { Sale } from './sales.model';
-import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-sales',
@@ -12,38 +10,64 @@ import { environment } from '../../environments/environment';
 })
 export class SalesComponent implements OnInit {
   sales: Sale[] = [];
-  showModal = false;
-  isEditMode = false;
-  saleForm = {
+  searchId: number | undefined;
+  searchResult: Sale | null = null;
+  showModal: boolean = false;
+  isEditMode: boolean = false;
+  saleForm: any = {
     saleDate: '',
     customer: '',
     branch: '',
-    products: [{ productName: '', quantity: 1, unitPrice: 0, totalAmount: 0 }]
+    products: [
+      {
+        productName: '',
+        quantity: 0,
+        unitPrice: 0,
+        totalAmount: 0
+      }
+    ]
   };
-  saleToEdit: Sale | null = null;
 
-  constructor(private http: HttpClient) { }
+  constructor(private salesService: SalesService) {}
 
-  ngOnInit(): void {
+  ngOnInit() {
     this.loadSales();
   }
 
   loadSales() {
-    this.http.get<Sale[]>('api/sales').subscribe(data => {
+    this.salesService.getSales().subscribe(data => {
       this.sales = data;
     });
   }
 
-  openCreateModal() {
-    this.saleForm = { saleDate: '', customer: '', branch: '', products: [{ productName: '', quantity: 1, unitPrice: 0, totalAmount: 0 }] };
-    this.isEditMode = false;
-    this.showModal = true;
+  searchSale() {
+    if (this.searchId) {
+      this.salesService.getSaleById(this.searchId).subscribe(result => {
+        this.searchResult = result;
+      });
+    }
   }
 
-  editSale(sale: Sale) {
-    this.saleForm = { ...sale };
-    this.isEditMode = true;
-    this.saleToEdit = sale;
+  clearSearch() {
+    this.searchId = undefined;
+    this.searchResult = null;
+  }
+
+  openCreateModal() {
+    this.isEditMode = false;
+    this.saleForm = {
+      saleDate: '',
+      customer: '',
+      branch: '',
+      products: [
+        {
+          productName: '',
+          quantity: 0,
+          unitPrice: 0,
+          totalAmount: 0
+        }
+      ]
+    };
     this.showModal = true;
   }
 
@@ -51,26 +75,34 @@ export class SalesComponent implements OnInit {
     this.showModal = false;
   }
 
-  saveSale() {
-    const url = this.isEditMode
-      ? `${environment.apiUrl}/api/sales/${this.saleToEdit?.id}` // Para edição
-      : `${environment.apiUrl}/api/sales`; // Para criação
-  
-    const method = this.isEditMode ? 'put' : 'post';
-
-    if (this.saleForm?.saleDate) {
-      this.saleForm.saleDate = new Date(this.saleForm.saleDate).toISOString();
-  }
-  
-    this.http[method](url, this.saleForm).subscribe(() => {
-      this.loadSales();
-      this.closeModal();
-    });
+  submitForm() {
+    if (this.isEditMode) {
+      this.salesService.updateSale(this.saleForm).subscribe(() => {
+        this.loadSales();
+        this.closeModal();
+      });
+    } else {
+      this.salesService.addSale(this.saleForm).subscribe(() => {
+        this.loadSales();
+        this.closeModal();
+      });
+    }
   }
 
-  deleteSale(saleId: number) {
-    this.http.delete(`api/sales/${saleId}`).subscribe(() => {
-      this.loadSales();
-    });
+  editSale(sale: Sale) {
+    this.isEditMode = true;
+    this.saleForm = { ...sale };
+    this.showModal = true;
+  }
+
+  deleteSale(id: number) {
+    if (id !== undefined && id !== null) {
+    } else {
+      console.error('ID is invalid');
+    }
+  }
+
+  updateTotalAmount(product: any) {
+    product.totalAmount = product.quantity * product.unitPrice;
   }
 }

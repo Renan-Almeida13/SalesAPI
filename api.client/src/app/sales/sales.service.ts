@@ -10,7 +10,7 @@ import { Sale } from './sales.model';
 export class SalesService {
   private apiUrl = `${environment.apiUrl}/sales`;
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
   getSales(): Observable<Sale[]> {
     return this.http.get<Sale[]>(this.apiUrl);
@@ -21,11 +21,17 @@ export class SalesService {
   }
 
   addSale(sale: Sale): Observable<Sale> {
-    return this.http.post<Sale>(`${this.apiUrl}/api/sales`, sale);
+    return this.http.post<Sale>(this.apiUrl, sale);
   }
 
   updateSale(sale: Sale): Observable<Sale> {
-    return this.http.put<Sale>(`${this.apiUrl}/${sale.id}`, sale);
+    if (sale.saleDate) {
+      const dateUtc = new Date(sale.saleDate);
+      sale.saleDate = dateUtc.toISOString().split('T')[0];
+    }
+  
+    const saleWithSaleId = { ...sale, saleId: sale.id };
+    return this.http.put<Sale>(`${this.apiUrl}/${sale.id}`, saleWithSaleId);
   }
 
   deleteSale(id: number): Observable<void> {

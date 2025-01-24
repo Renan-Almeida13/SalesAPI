@@ -25,6 +25,12 @@ namespace API.Server.Controllers
             {
                 return BadRequest(ModelState);
             }
+
+            if (command.SaleDate.Kind != DateTimeKind.Utc)
+            {
+                command.SaleDate = command.SaleDate.ToUniversalTime();
+            }
+
             var response = await _mediator.Send(command);
             return HandleApiResponse(response);
         }
@@ -50,6 +56,11 @@ namespace API.Server.Controllers
         {
             if (saleId != command.SaleId)
                 return BadRequest(new { message = "Sale ID in the route does not match the command data." });
+
+            if (command.SaleDate.Kind != DateTimeKind.Utc)
+            {
+                command.SaleDate = command.SaleDate.ToUniversalTime();
+            }
 
             var response = await _mediator.Send(command);
             return HandleApiResponse(response);

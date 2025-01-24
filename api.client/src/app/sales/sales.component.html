@@ -5,67 +5,114 @@
     <button (click)="openCreateModal()">Add New Sale</button>
   </div>
 
-  <div *ngIf="sales.length > 0">
-    <h2>Registered Sales</h2>
+  <div class="search">
+    <input type="number" placeholder="Search by ID" [(ngModel)]="searchId" />
+    <button (click)="searchSale()">Search</button>
+    <button *ngIf="searchResult" (click)="clearSearch()">Clear Search</button>
+  </div>
+
+  <div *ngIf="searchResult; else salesList">
+    <h3>Search Result</h3>
     <table>
       <thead>
         <tr>
           <th>ID</th>
-          <th>Date</th>
           <th>Customer</th>
-          <th>Total</th>
+          <th>Branch</th>
+          <th>Sale Date</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let sale of sales">
-          <td>{{ sale.id }}</td>
-          <td>{{ sale.saleDate | date }}</td>
-          <td>{{ sale.customer }}</td>
-          <td>{{ sale.totalSaleAmount | currency }}</td>
+        <tr>
+          <td>{{ searchResult.id }}</td>
+          <td>{{ searchResult.customer }}</td>
+          <td>{{ searchResult.branch }}</td>
+          <td>{{ searchResult.saleDate | date }}</td>
           <td>
-            <button (click)="editSale(sale)">Edit</button>
-            <button (click)="deleteSale(sale.id)">Delete</button>
+            <button (click)="editSale(searchResult)">Edit</button>
+            <button *ngIf="searchResult?.id !== undefined" (click)="deleteSale(searchResult?.id!)">Delete</button>
           </td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <div *ngIf="!sales.length">
-    <p>No sales registered.</p>
-  </div>
+  <ng-template #salesList>
+    <h3>All Sales</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Customer</th>
+          <th>Branch</th>
+          <th>Sale Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let sale of sales">
+          <td>{{ sale.id }}</td>
+          <td>{{ sale.customer }}</td>
+          <td>{{ sale.branch }}</td>
+          <td>{{ sale.saleDate | date }}</td>
+          <td>
+            <button (click)="editSale(sale)">Edit</button>
+            <button *ngIf="searchResult?.id !== undefined" (click)="deleteSale(searchResult?.id!)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-template>
 
   <div class="modal" *ngIf="showModal">
     <div class="modal-content">
-      <h3>{{ isEditMode ? 'Edit Sale' : 'New Sale' }}</h3>
-      <form (ngSubmit)="saveSale()">
-        <label for="customer">Customer:</label>
-        <input type="text" id="customer" [(ngModel)]="saleForm.customer" name="customer" required />
-
-        <label for="saleDate">Sale Date:</label>
-        <input type="date" id="saleDate" [(ngModel)]="saleForm.saleDate" name="saleDate" required />
-
-        <label for="branch">Branch:</label>
-        <input type="text" id="branch" [(ngModel)]="saleForm.branch" name="branch" required />
-
+      <span class="close-btn" (click)="closeModal()">&times;</span>
+      <h2>{{ isEditMode ? 'Edit Sale' : 'Create Sale' }}</h2>
+  
+      <form (ngSubmit)="submitForm()">
+        <div>
+          <label for="saleDate">Sale Date:</label>
+          <input type="date" [(ngModel)]="saleForm.saleDate" name="saleDate" required />
+        </div>
+  
+        <div>
+          <label for="customer">Customer:</label>
+          <input type="text" [(ngModel)]="saleForm.customer" name="customer" required />
+        </div>
+  
+        <div>
+          <label for="branch">Branch:</label>
+          <input type="text" [(ngModel)]="saleForm.branch" name="branch" required />
+        </div>
+  
         <div *ngFor="let product of saleForm.products; let i = index">
           <h4>Product {{ i + 1 }}</h4>
-          <label for="productName">Product:</label>
-          <input type="text" [(ngModel)]="product.productName" name="productName{{ i }}" required />
-
-          <label for="quantity">Quantity:</label>
-          <input type="number" [(ngModel)]="product.quantity" name="quantity{{ i }}" required />
-
-          <label for="unitPrice">Unit Price:</label>
-          <input type="number" [(ngModel)]="product.unitPrice" name="unitPrice{{ i }}" required />
-
-          <label for="totalAmount">Total:</label>
-          <input type="number" [value]="product.quantity * product.unitPrice" disabled />
+          
+          <div>
+            <label for="productName">Product Name:</label>
+            <input type="text" [(ngModel)]="product.productName" name="productName{{i}}" required />
+          </div>
+  
+          <div>
+            <label for="quantity">Quantity:</label>
+            <input type="number" [(ngModel)]="product.quantity" name="quantity{{i}}" required (ngModelChange)="updateTotalAmount(product)" />
+          </div>
+  
+          <div>
+            <label for="unitPrice">Unit Price:</label>
+            <input type="number" [(ngModel)]="product.unitPrice" name="unitPrice{{i}}" required (ngModelChange)="updateTotalAmount(product)" />
+          </div>
+  
+          <div>
+            <label for="totalAmount">Total Amount:</label>
+            <input type="number" [(ngModel)]="product.totalAmount" name="totalAmount{{i}}" readonly />
+          </div>
+          
+          <hr />
         </div>
-
-        <button type="submit">{{ isEditMode ? 'Update' : 'Create' }} Sale</button>
-        <button type="button" (click)="closeModal()">Cancel</button>
+  
+        <button type="submit">{{ isEditMode ? 'Save Changes' : 'Add Sale' }}</button>
       </form>
     </div>
   </div>

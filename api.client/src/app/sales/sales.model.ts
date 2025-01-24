@@ -1,13 +1,14 @@
 export interface Sale {
-  id: number;
+  id?: number;
   saleDate: string;
   customer: string;
   branch: string;
-  totalSaleAmount: string;
-  products: { productName: string; quantity: number; unitPrice: number; totalAmount: number }[];
+  totalSaleAmount: number;
+  products: { saleId: null, productName: string; quantity: number; unitPrice: number; totalAmount: number }[];
 }
 
 export interface SaleItem {
+  saleId?: number;
   productName: string;
   quantity: number;
   unitPrice: number;
