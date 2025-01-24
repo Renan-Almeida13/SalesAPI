@@ -21,7 +21,7 @@ export class SalesService {
   }
 
   addSale(sale: Sale): Observable<Sale> {
-    return this.http.post<Sale>(this.apiUrl, sale);
+    return this.http.post<Sale>(`${this.apiUrl}/api/sales`, sale);
   }
 
   updateSale(sale: Sale): Observable<Sale> {

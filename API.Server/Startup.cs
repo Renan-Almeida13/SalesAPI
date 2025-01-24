@@ -7,6 +7,7 @@ using Infrastructure.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using System.Globalization;
 using System.Reflection;
 
 namespace API.Server
@@ -22,6 +23,12 @@ namespace API.Server
 
         public void ConfigureServices(IServiceCollection services)
         {
+
+            var cultureInfo = new CultureInfo("en-US")
+            {
+                DateTimeFormat = { ShortDatePattern = "yyyy-MM-dd", LongTimePattern = "HH:mm:ss" }
+            };
+
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(policy =>

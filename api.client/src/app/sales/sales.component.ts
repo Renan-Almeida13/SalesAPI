@@ -2,12 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Sale } from './sales.model';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-sales',
   templateUrl: './sales.component.html',
   styleUrls: ['./sales.component.css'],
-  standalone: true
+  standalone: false
 })
 export class SalesComponent implements OnInit {
   sales: Sale[] = [];
@@ -51,9 +52,16 @@ export class SalesComponent implements OnInit {
   }
 
   saveSale() {
-    const url = this.isEditMode ? `api/sales/${this.saleToEdit?.id}` : 'api/sales';
+    const url = this.isEditMode
+      ? `${environment.apiUrl}/api/sales/${this.saleToEdit?.id}` // Para edição
+      : `${environment.apiUrl}/api/sales`; // Para criação
+  
     const method = this.isEditMode ? 'put' : 'post';
 
+    if (this.saleForm?.saleDate) {
+      this.saleForm.saleDate = new Date(this.saleForm.saleDate).toISOString();
+  }
+  
     this.http[method](url, this.saleForm).subscribe(() => {
       this.loadSales();
       this.closeModal();

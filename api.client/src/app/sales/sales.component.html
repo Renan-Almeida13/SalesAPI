@@ -52,16 +52,16 @@
         <div *ngFor="let product of saleForm.products; let i = index">
           <h4>Product {{ i + 1 }}</h4>
           <label for="productName">Product:</label>
-          <input type="text" [(ngModel)]="product.productName" name="productName" required />
+          <input type="text" [(ngModel)]="product.productName" name="productName{{ i }}" required />
 
           <label for="quantity">Quantity:</label>
-          <input type="number" [(ngModel)]="product.quantity" name="quantity" required />
+          <input type="number" [(ngModel)]="product.quantity" name="quantity{{ i }}" required />
 
           <label for="unitPrice">Unit Price:</label>
-          <input type="number" [(ngModel)]="product.unitPrice" name="unitPrice" required />
+          <input type="number" [(ngModel)]="product.unitPrice" name="unitPrice{{ i }}" required />
 
           <label for="totalAmount">Total:</label>
-          <input type="number" [(ngModel)]="product.totalAmount" name="totalAmount" [value]="product.quantity * product.unitPrice" disabled />
+          <input type="number" [value]="product.quantity * product.unitPrice" disabled />
         </div>
 
         <button type="submit">{{ isEditMode ? 'Update' : 'Create' }} Sale</button>

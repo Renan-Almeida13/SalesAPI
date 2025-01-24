@@ -3,6 +3,7 @@ export interface Sale {
   saleDate: string;
   customer: string;
   branch: string;
+  totalSaleAmount: string;
   products: { productName: string; quantity: number; unitPrice: number; totalAmount: number }[];
 }
 
